@@ -7,7 +7,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 import asyncio
 
 # записываем ключ
-api = ""
+api = " "
 bot = Bot(token=api)
 dp = Dispatcher(bot, storage=MemoryStorage())
 
@@ -17,11 +17,6 @@ class UserState(StatesGroup):
     growth = State()
     weight = State()
 
-# обработка сообщений хендлеры
-@dp.callback_query_handler(text="calories")
-async def set_age(call):
-    await call.message.answer("Введите свой возраст")
-    await UserState.age.set()
 
 kb = ReplyKeyboardMarkup(
     keyboard=[
@@ -49,6 +44,12 @@ menu2.add(button6)
 menu2.add(button7)
 menu2.add(button8)
 
+
+@dp.message_handler(commands = ["start"])
+async def Start_message(message):
+    #reply_markup=kb показываем клавиатуру
+    await message.answer("Привет! Я бот помогающий твоему здоровью", reply_markup=kb)
+
 @dp.message_handler(text = "Купить")
 async def get_buying_list(message):
     for i in range(1, 5):
@@ -67,20 +68,21 @@ async def send_confirm_message(call):
 async def main_menu(message):
     await message.answer("Выбери опцию", reply_markup=menu)
 
+# обработка сообщений хендлеры
+@dp.callback_query_handler(text="calories")
+async def set_age(call):
+    await call.message.answer("Введите свой возраст")
+    await UserState.age.set()
+
 @dp.callback_query_handler(text = 'formulas')
 async def get_formulas(call):
     await call.message.answer("10 х вес (кг) + 6,25 x рост (см) – 5 х возраст (г) + 5")
     await call.answer()
 
-@dp.message_handler(commands = ["start"])
-async def Start_message(message):
-    #reply_markup=kb показываем клавиатуру
-    await message.answer("Привет! Я бот помогающий твоему здоровью", reply_markup=kb)
-
 #обрабатываем кнопку
-@dp.message_handler(text = "Рассчитать")
-async def inform(message):
-    await message.answer("Рассчитать")
+#@dp.message_handler(text = "Рассчитать")
+#async def inform(message):
+    #await message.answer("Рассчитать")
 
 @dp.message_handler(state=UserState.age)
 async def set_growth(message, state):
